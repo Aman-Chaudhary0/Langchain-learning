@@ -5,6 +5,7 @@ from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint
 from typing import Annotated
 import requests
 import json
+from langchain.agents import create_agent
 
 load_dotenv()
 
@@ -13,7 +14,7 @@ def get_conversion_factor(base_currency: str, target_currency: str) -> float:
   """
   This function fetches the currency conversion factor between a given base currency and a target currency
   """
-  url = f'https://v6.exchangerate-api.com/v6/c754eab14ffab33112e380ca/pair/{base_currency}/{target_currency}'
+  url = f'https://v6.exchangerate-api.com/v6/9ff527b26036674ededb279a/pair/{base_currency}/{target_currency}'
 
   response = requests.get(url)
 
@@ -70,4 +71,26 @@ for tool_call in ai_message.tool_calls:
 
 # print(messages)
 
-print(llm_with_tools.invoke(messages))
+final_response = llm_with_tools.invoke(messages)
+print("Final Response:", final_response.content)
+
+
+# Step 5: Initialize the Agent
+
+agent = create_agent(
+    model=model,
+    tools=[get_conversion_factor, convert],
+)
+
+
+# Step 6: Run the Agent
+
+user_query = "Hi how are you?"
+
+response = agent.invoke({
+    "messages": [
+        HumanMessage(content=user_query)
+    ]
+})
+
+print("Agent Response:", response["messages"][-1].content)
