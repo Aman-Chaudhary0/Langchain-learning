@@ -59,6 +59,7 @@ retriever = vector_store.as_retriever(
 )
 print(retriever)
 
+
 #%%
 retriever.invoke("what is deepmind?")
 
